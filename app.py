@@ -36,6 +36,7 @@ groq_client = Groq(api_key=GROQ_API_KEY)
 embed_model = HuggingFaceEmbedding(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
 
+
 # Utility: Process files to extract text
 def process_file(file_path):
     ext = Path(file_path).suffix.lower()
@@ -164,6 +165,7 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     debug_mode = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
     app.run(host='0.0.0.0', port=port, debug=debug_mode)
+
 
 
 
