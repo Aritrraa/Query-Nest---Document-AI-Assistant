@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Document AI Assistant</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* CSS Variables for Theme Management */
+        :root {
+          /* Light Theme Colors */
+          --bg-primary: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
+          --bg-secondary: rgba(255, 255, 255, 0.8);
+          --bg-card: rgba(255, 255, 255, 0.9);
+          --text-primary: #1e293b;
+          --text-secondary: #64748b;
+          --text-muted: #94a3b8;
+          --border-color: rgba(226, 232, 240, 0.5);
+          --shadow-color: rgba(0, 0, 0, 0.1);
+          --accent-blue: #3b82f6;
+          --accent-purple: #8b5cf6;
+          --accent-green: #10b981;
+          --accent-orange: #f59e0b;
+          --accent-red: #ef4444;
+          --glass-bg: rgba(255, 255, 255, 0.1);
+          --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        [data-theme="dark"], .dark-theme {
+          /* Dark Theme Colors */
+          --bg-primary: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+          --bg-secondary: rgba(15, 23, 42, 0.8);
+          --bg-card: rgba(30, 41, 59, 0.9);
+          --text-primary: #f8fafc;
+          --text-secondary: #cbd5e1;
+          --text-muted: #94a3b8;
+          --border-color: rgba(71, 85, 105, 0.5);
+          --shadow-color: rgba(0, 0, 0, 0.3);
+          --accent-blue: #60a5fa;
+          --accent-purple: #a78bfa;
+          --accent-green: #34d399;
+          --accent-orange: #fbbf24;
+          --accent-red: #f87171;
+          --glass-bg: rgba(0, 0, 0, 0.2);
+          --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Reset and Base Styles */
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        html {
+          scroll-behavior: smooth;
+        }
+
+        body {
+          font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+          background: var(--bg-primary);
+          color: var(--text-primary);
+          line-height: 1.6;
+          min-height: 100vh;
+          transition: all 0.3s ease;
+          overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: -1;
+        }
+
+        .floating-element {
+          position: absolute;
+          border-radius: 50%;
+          opacity: 0.1;
+          animation: float 8s ease-in-out infinite;
+        }
+
+        .element-1 {
+          width: 300px;
+          height: 300px;
+          background: var(--accent-blue);
+          top: -150px;
+          right: -150px;
+          animation-delay: 0s;
+        }
+
+        .element-2 {
+          width: 400px;
+          height: 400px;
+          background: var(--accent-purple);
+          bottom: -200px;
+          left: -200px;
+          animation-delay: 2s;
+        }
+
+        .element-3 {
+          width: 250px;
+          height: 250px;
+          background: var(--accent-green);
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          animation: spin 20s linear infinite;
+          opacity: 0.05;
+        }
+
+        .grid-pattern {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-image: 
+            linear-gradient(var(--border-color) 1px, transparent 1px),
+            linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+          background-size: 50px 50px;
+          opacity: 0.3;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+          position: fixed;
+          top: 2rem;
+          right: 2rem;
+          width: 60px;
+          height: 60px;
+          border: none;
+          border-radius: 50%;
+          background: var(--bg-card);
+          backdrop-filter: blur(20px);
+          border: 1px solid var(--border-color);
+          cursor: pointer;
+          z-index: 1000;
+          transition: all 0.3s ease;
+          box-shadow: 0 8px 32px var(--shadow-color);
+        }
+
+        .theme-toggle:hover {
+          transform: scale(1.1);
+          box-shadow: 0 12px 40px var(--shadow-color);
+        }
+
+        .theme-toggle i {
+          font-size: 1.5rem;
+          transition: all 0.3s ease;
+        }
+
+        .light-theme .sun-icon {
+          color: var(--accent-orange);
+          opacity: 1;
+        }
+
+        .light-theme .moon-icon {
+          opacity: 0;
+          position: absolute;
+        }
+
+        .dark-theme .moon-icon {
+          color: var(--accent-blue);
+          opacity: 1;
+        }
+
+        .dark-theme .sun-icon {
+          opacity: 0;
+          position: absolute;
+        }
+
+        /* Container */
+        .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 2rem;
+          position: relative;
+          z-index: 1;
+        }
+
+        /* Header */
+        .header {
+          text-align: center;
+          margin-bottom: 4rem;
+          animation: fadeInUp 1s ease-out;
+        }
+
+        .logo {
+          margin-bottom: 2rem;
+        }
+
+        .logo-icon {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 100px;
+          height: 100px;
+          background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+          border-radius: 2rem;
+          box-shadow: 0 20px 60px rgba(59, 130, 246, 0.3);
+          animation: pulse 2s ease-in-out infinite;
+          transition: transform 0.3s ease;
+        }
+
+        .logo-icon:hover {
+          transform: scale(1.1);
+        }
+
+        .logo-icon i {
+          font-size: 3rem;
+          color: white;
+        }
+
+        .title {
+          font-size: 4rem;
+          font-weight: 800;
+          background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple), var(--accent-green));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          margin-bottom: 1rem;
+          animation: gradientShift 3s ease infinite;
+        }
+
+        .subtitle {
+          font-size: 1.25rem;
+          color: var(--text-secondary);
+          max-width: 600px;
+          margin: 0 auto 2rem;
+          line-height: 1.8;
+        }
+
+        .features {
+          display: flex;
+          justify-content: center;
+          gap: 2rem;
+          flex-wrap: wrap;
+        }
+
+        .feature {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.75rem 1.5rem;
+          background: var(--glass-bg);
+          backdrop-filter: blur(20px);
+          border: 1px solid var(--glass-border);
+          border-radius: 2rem;
+          font-weight: 600;
+          transition: all 0.3s ease;
+        }
+
+        .feature:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px var(--shadow-color);
+        }
+
+        .feature i {
+          color: var(--accent-blue);
+        }
+
+        /* Cards */
+        .card {
+          background: var(--bg-card);
+          backdrop-filter: blur(20px);
+          border: 1px solid var(--border-color);
+          border-radius: 2rem;
+          padding: 2.5rem;
+          margin-bottom: 2rem;
+          box-shadow: 0 20px 60px var(--shadow-color);
+          transition: all 0.3s ease;
+          animation: slideInUp 0.8s ease-out;
+        }
+
+        .card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 30px 80px var(--shadow-color);
+        }
+
+        .card-header {
+          display: flex;
+          align-items: center;
+          margin-bottom: 2rem;
+        }
+
+        .card-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 60px;
+          height: 60px;
+          background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+          border-radius: 1.5rem;
+          margin-right: 1rem;
+          box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .card-icon i {
+          font-size: 1.5rem;
+          color: white;
+        }
+
+        .card h2 {
+          font-size: 2rem;
+          font-weight: 700;
+          color: var(--text-primary);
+        }
+
+        .card h3 {
+          font-size: 1.5rem;
+          font-weight: 600;
+          color: var(--text-primary);
+          margin-bottom: 1.5rem;
+        }
+
+        /* Upload Area */
+        .upload-area {
+          border: 2px dashed var(--border-color);
+          border-radius: 1.5rem;
+          padding: 3rem;
+          text-align: center;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .upload-area::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+          transition: left 0.5s ease;
+        }
+
+        .upload-area:hover::before {
+          left: 100%;
+        }
+
+        .upload-area:hover {
+          border-color: var(--accent-blue);
+          background: var(--glass-bg);
+          transform: scale(1.02);
+        }
+
+        .upload-area.dragover {
+          border-color: var(--accent-blue);
+          background: rgba(59, 130, 246, 0.1);
+          transform: scale(1.02);
+        }
+
+        .upload-content {
+          position: relative;
+          z-index: 1;
+        }
+
+        .upload-icon {
+          width: 80px;
+          height: 80px;
+          background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 1.5rem;
+          transition: transform 0.3s ease;
+        }
+
+        .upload-area:hover .upload-icon {
+          transform: scale(1.1) rotate(5deg);
+        }
+
+        .upload-icon i {
+          font-size: 2rem;
+          color: white;
+        }
+
+        .upload-content h3 {
+          font-size: 1.5rem;
+          margin-bottom: 0.5rem;
+          color: var(--text-primary);
+        }
+
+        .upload-content p {
+          color: var(--text-secondary);
+          margin-bottom: 1.5rem;
+        }
+
+        .upload-features {
+          display: flex;
+          justify-content: center;
+          gap: 1rem;
+          flex-wrap: wrap;
+        }
+
+        .feature-tag {
+          padding: 0.5rem 1rem;
+          background: var(--glass-bg);
+          border: 1px solid var(--glass-border);
+          border-radius: 1rem;
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: var(--text-secondary);
+        }
+
+        /* File List */
+        .file-list {
+          margin: 2rem 0;
+          max-height: 300px;
+          overflow-y: auto;
+        }
+
+        .file-item {
+          display: flex;
+          align-items: center;
+          padding: 1rem;
+          background: var(--glass-bg);
+          border: 1px solid var(--glass-border);
+          border-radius: 1rem;
+          margin-bottom: 0.5rem;
+          transition: all 0.3s ease;
+        }
+
+        .file-item:hover {
+          transform: translateX(5px);
+          background: var(--bg-secondary);
+        }
+
+        .file-item i {
+          color: var(--accent-blue);
+          margin-right: 1rem;
+          font-size: 1.25rem;
+        }
+
+        .file-info {
+          flex: 1;
+        }
+
+        .file-name {
+          font-weight: 600;
+          color: var(--text-primary);
+        }
+
+        .file-size {
+          font-size: 0.875rem;
+          color: var(--text-muted);
+        }
+
+        /* Quick Questions */
+        .question-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 1rem;
+        }
+
+        .question-btn {
+          display: flex;
+          align-items: center;
+          padding: 1.5rem;
+          background: var(--glass-bg);
+          border: 1px solid var(--glass-border);
+          border-radius: 1rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          text-align: left;
+          font-size: 1rem;
+          color: var(--text-primary);
+        }
+
+        .question-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px var(--shadow-color);
+          background: var(--bg-secondary);
+        }
+
+        .question-icon {
+          width: 40px;
+          height: 40px;
+          border-radius: 0.75rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-right: 1rem;
+          flex-shrink: 0;
+        }
+
+        .question-icon.blue {
+          background: linear-gradient(135deg, #3b82f6, #06b6d4);
+        }
+
+        .question-icon.purple {
+          background: linear-gradient(135deg, #8b5cf6, #ec4899);
+        }
+
+        .question-icon.orange {
+          background: linear-gradient(135deg, #f59e0b, #f97316);
+        }
+
+        .question-icon.green {
+          background: linear-gradient(135deg, #10b981, #14b8a6);
+        }
+
+        .question-icon i {
+          color: white;
+          font-size: 1rem;
+        }
+
+        /* Question Input */
+        .question-input-container {
+          position: relative;
+          margin-bottom: 2rem;
+        }
+
+        #questionInput {
+          width: 100%;
+          padding: 1.5rem 4rem 1.5rem 1.5rem;
+          border: 2px solid var(--border-color);
+          border-radius: 1.5rem;
+          background: var(--bg-secondary);
+          color: var(--text-primary);
+          font-size: 1rem;
+          resize: vertical;
+          min-height: 120px;
+          transition: all 0.3s ease;
+        }
+
+        #questionInput:focus {
+          outline: none;
+          border-color: var(--accent-blue);
+          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        #questionInput::placeholder {
+          color: var(--text-muted);
+        }
+
+        .send-btn {
+          position: absolute;
+          bottom: 1rem;
+          right: 1rem;
+          width: 50px;
+          height: 50px;
+          border: none;
+          border-radius: 50%;
+          background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+          color: white;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .send-btn:hover {
+          transform: scale(1.1);
+          box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Buttons */
+        .btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 1rem 2rem;
+          border: none;
+          border-radius: 1rem;
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          text-decoration: none;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+          transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+          left: 100%;
+        }
+
+        .btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px var(--shadow-color);
+        }
+
+        .btn-primary {
+          background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+          color: white;
+        }
+
+        .btn-secondary {
+          background: linear-gradient(135deg, var(--accent-green), #14b8a6);
+          color: white;
+        }
+
+        .btn-danger {
+          background: linear-gradient(135deg, var(--accent-red), #dc2626);
+          color: white;
+        }
+
+        .upload-btn {
+          width: 100%;
+          justify-content: center;
+          padding: 1.25rem 2rem;
+          font-size: 1.125rem;
+          margin-top: 1.5rem;
+        }
+
+        .action-buttons {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 1rem;
+        }
+
+        /* Response Section */
+        .response-content {
+          position: relative;
+        }
+
+        .response-text {
+          background: var(--glass-bg);
+          border: 1px solid var(--glass-border);
+          border-radius: 1.5rem;
+          padding: 2rem;
+          white-space: pre-wrap;
+          font-family: 'Segoe UI', sans-serif;
+          font-size: 1rem;
+          line-height: 1.8;
+          color: var(--text-primary);
+          border-left: 4px solid var(--accent-blue);
+          min-height: 100px;
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+          margin-top: 1rem;
+        }
+
+        .typing-indicator span {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: var(--accent-blue);
+          animation: typing 1.4s ease-in-out infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+          animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+          animation-delay: 0.4s;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.8);
+          backdrop-filter: blur(10px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+        }
+
+        .loading-content {
+          text-align: center;
+          background: var(--bg-card);
+          padding: 3rem;
+          border-radius: 2rem;
+          border: 1px solid var(--border-color);
+          box-shadow: 0 20px 60px var(--shadow-color);
+        }
+
+        .loading-spinner {
+          width: 60px;
+          height: 60px;
+          border: 4px solid var(--border-color);
+          border-top: 4px solid var(--accent-blue);
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin: 0 auto 1.5rem;
+        }
+
+        .loading-content h3 {
+          font-size: 1.5rem;
+          margin-bottom: 0.5rem;
+          color: var(--text-primary);
+        }
+
+        .loading-content p {
+          color: var(--text-secondary);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes slideInUp {
+          from {
+            opacity: 0;
+            transform: translateY(50px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-20px);
+          }
+        }
+
+        @keyframes spin {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        @keyframes pulse {
+          0%, 100% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.05);
+          }
+        }
+
+        @keyframes gradientShift {
+          0%, 100% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+        }
+
+        @keyframes typing {
+          0%, 60%, 100% {
+            transform: translateY(0);
+            opacity: 0.4;
+          }
+          30% {
+            transform: translateY(-10px);
+            opacity: 1;
+          }
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        
+        @keyframes slideOutUp {
+            from {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-100%);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+          .container {
+            padding: 1rem;
+          }
+          
+          .title {
+            font-size: 2.5rem;
+          }
+          
+          .card {
+            padding: 1.5rem;
+          }
+          
+          .features {
+            flex-direction: column;
+            align-items: center;
+          }
+          
+          .question-grid {
+            grid-template-columns: 1fr;
+          }
+          
+          .action-buttons {
+            grid-template-columns: 1fr;
+          }
+          
+          .theme-toggle {
+            top: 1rem;
+            right: 1rem;
+            width: 50px;
+            height: 50px;
+          }
+          
+          .upload-area {
+            padding: 2rem 1rem;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .title {
+            font-size: 2rem;
+          }
+          
+          .subtitle {
+            font-size: 1rem;
+          }
+          
+          .card-header {
+            flex-direction: column;
+            text-align: center;
+          }
+          
+          .card-icon {
+            margin-right: 0;
+            margin-bottom: 1rem;
+          }
+        }
+
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+          * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+          }
+        }
+
+        /* Focus styles */
+        button:focus-visible,
+        input:focus-visible,
+        textarea:focus-visible {
+          outline: 2px solid var(--accent-blue);
+          outline-offset: 2px;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+          width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+          background: var(--bg-secondary);
+          border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+          background: var(--border-color);
+          border-radius: 6px;
+          border: 2px solid var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+          background: var(--text-muted);
+        }
+    </style>
+</head>
+<body class="light-theme">
+    <!-- Animated Background Elements -->
+    <div class="bg-animation">
+        <div class="floating-element element-1"></div>
+        <div class="floating-element element-2"></div>
+        <div class="floating-element element-3"></div>
+        <div class="grid-pattern"></div>
+    </div>
+
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <i class="fas fa-sun sun-icon"></i>
+        <i class="fas fa-moon moon-icon"></i>
+    </button>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+            </div>
+            <h1 class="title">Query Nest </h1>
+            <h2 class="subtitle">Document AI Assistant</h2>
+            <p class="subtitle">Experience the future of document analysis with our advanced AI-powered assistant</p>
+            <div class="features">
+                <div class="feature">
+                    <i class="fas fa-bolt"></i>
+                    <span>Lightning Fast</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-star"></i>
+                    <span>AI Powered</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-rocket"></i>
+                    <span>Production Ready</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Upload Section -->
+        <section class="card upload-section">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-upload"></i>
+                </div>
+                <h2>Upload Documents</h2>
+            </div>
+            
+            <form id="uploadForm">
+                <div class="upload-area" id="uploadArea">
+                    <input type="file" id="fileInput" name="file" multiple accept=".pdf,.doc,.docx,.txt" hidden>
+                    <div class="upload-content">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <h3>Drop files here or click to upload</h3>
+                        <p>Supports PDF, DOC, DOCX, and TXT files</p>
+                        <div class="upload-features">
+                            <span class="feature-tag">Multi-file support</span>
+                            <span class="feature-tag">Instant indexing</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="file-list" id="fileList" style="display: none;"></div>
+                
+                <button type="submit" class="btn btn-primary upload-btn" id="uploadBtn">
+                    <i class="fas fa-upload"></i>
+                    <span>Upload & Index Documents</span>
+                </button>
+            </form>
+        </section>
+
+        <!-- Quick Questions -->
+        <section class="card quick-questions">
+            <h3>Quick Questions</h3>
+            <div class="question-grid">
+                <button class="question-btn" onclick="setQuestion('What are the main topics discussed?')">
+                    <div class="question-icon blue">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <span>What are the main topics discussed?</span>
+                </button>
+                <button class="question-btn" onclick="setQuestion('What are the key findings?')">
+                    <div class="question-icon purple">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <span>What are the key findings?</span>
+                </button>
+                <button class="question-btn" onclick="setQuestion('What insights can you provide?')">
+                    <div class="question-icon orange">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <span>What insights can you provide?</span>
+                </button>
+                <button class="question-btn" onclick="setQuestion('Explain the methodology used')">
+                    <div class="question-icon green">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <span>Explain the methodology used</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Actions Section -->
+        <section class="card actions-section">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <h2>Interact with Documents</h2>
+            </div>
+
+            <div class="question-input-container">
+                <textarea 
+                    id="questionInput" 
+                    placeholder="Ask any question about your documents..."
+                    rows="4"
+                ></textarea>
+                <button class="send-btn" onclick="askQuestion()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="summarize()">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Generate Summary</span>
+                </button>
+                <button class="btn btn-danger" onclick="deleteFiles()">
+                    <i class="fas fa-trash-alt"></i>
+                    <span>Delete All Files</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Response Section -->
+        <section class="card response-section" id="responseSection" style="display: none;">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-magic"></i>
+                </div>
+                <h2>AI Response</h2>
+            </div>
+            <div class="response-content">
+                <pre id="response" class="response-text"></pre>
+                <div class="typing-indicator" id="typingIndicator" style="display: none;">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h3>Processing...</h3>
+            <p>AI is analyzing your documents</p>
+        </div>
+    </div>
+
+    <script>
+        // Theme Management
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.classList.contains('dark-theme') ? 'dark' : 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            body.classList.remove('light-theme', 'dark-theme');
+            body.classList.add(`${newTheme}-theme`);
+            
+            // Save theme preference
+            localStorage.setItem('theme', newTheme);
+            
+            // Add smooth transition effect
+            body.style.transition = 'all 0.3s ease';
+            setTimeout(() => {
+                body.style.transition = '';
+            }, 300);
+        }
+
+        // Load saved theme on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.body.classList.add(`${savedTheme}-theme`);
+            
+            // Initialize animations
+            initializeAnimations();
+        });
+
+        // File Upload Functionality
+        const uploadForm = document.getElementById('uploadForm');
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const fileList = document.getElementById('fileList');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const responseSection = document.getElementById('responseSection');
+        const response = document.getElementById('response');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        let selectedFiles = [];
+
+        // Drag and Drop Functionality
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files);
+            handleFiles(files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            handleFiles(files);
+        });
+
+        function handleFiles(files) {
+            selectedFiles = files;
+            displayFileList();
+            updateUploadButton();
+        }
+
+        function displayFileList() {
+            if (selectedFiles.length === 0) {
+                fileList.style.display = 'none';
+                return;
+            }
+            
+            fileList.style.display = 'block';
+            fileList.innerHTML = `
+                <h4 style="margin-bottom: 1rem; color: var(--text-primary);">
+                    Selected Files (${selectedFiles.length}):
+                </h4>
+            `;
+            
+            selectedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.style.animationDelay = `${index * 0.1}s`;
+                
+                fileItem.innerHTML = `
+                    <i class="fas fa-file-alt"></i>
+                    <div class="file-info">
+                        <div class="file-name">${file.name}</div>
+                        <div class="file-size">${(file.size / 1024 / 1024).toFixed(2)} MB</div>
+                    </div>
+                `;
+                
+                fileList.appendChild(fileItem);
+            });
+        }
+
+        function updateUploadButton(status = null) {
+            if (status === null) {
+                if (selectedFiles.length === 0) {
+                    uploadBtn.innerHTML = `
+                        <i class="fas fa-upload"></i>
+                        <span>Upload & Index Documents</span>
+                    `;
+                    uploadBtn.disabled = true;
+                    uploadBtn.style.opacity = '0.6';
+                } else {
+                    uploadBtn.innerHTML = `
+                        <i class="fas fa-upload"></i>
+                        <span>Upload & Index ${selectedFiles.length} Document${selectedFiles.length > 1 ? 's' : ''}</span>
+                    `;
+                    uploadBtn.disabled = false;
+                    uploadBtn.style.opacity = '1';
+                }
+                return;
+            }
+
+            const btn = uploadBtn;
+            
+            switch (status) {
+                case 'uploading':
+                    btn.innerHTML = `
+                        <div class="loading-spinner" style="width: 20px; height: 20px; margin-right: 0.5rem;"></div>
+                        <span>Uploading & Indexing...</span>
+                    `;
+                    btn.disabled = true;
+                    break;
+                case 'success':
+                    btn.innerHTML = `
+                        <i class="fas fa-check-circle"></i>
+                        <span>Upload Complete</span>
+                    `;
+                    btn.style.background = 'linear-gradient(135deg, var(--accent-green), #14b8a6)';
+                    setTimeout(() => {
+                        updateUploadButton();
+                        btn.style.background = '';
+                    }, 3000);
+                    break;
+                case 'error':
+                    btn.innerHTML = `
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>Upload Failed</span>
+                    `;
+                    btn.style.background = 'linear-gradient(135deg, var(--accent-red), #dc2626)';
+                    setTimeout(() => {
+                        updateUploadButton();
+                        btn.style.background = '';
+                    }, 3000);
+                    break;
+            }
+        }
+
+        // Form Submission
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (selectedFiles.length === 0) return;
+            
+            showLoading();
+            updateUploadButton('uploading');
+            
+            // Simulate upload process (replace with actual API call)
+            try {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                showResponse("✅ Files uploaded and indexed successfully! You can now ask questions about your documents.", 'success');
+                updateUploadButton('success');
+            } catch (error) {
+                showResponse("❌ Upload failed. Please try again.", 'error');
+                updateUploadButton('error');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // Question Functionality
+        function setQuestion(questionText) {
+            const questionInput = document.getElementById('questionInput');
+            questionInput.value = questionText;
+            questionInput.focus();
+            
+            // Add visual feedback
+            questionInput.style.transform = 'scale(1.02)';
+            setTimeout(() => {
+                questionInput.style.transform = '';
+            }, 200);
+        }
+
+        async function askQuestion() {
+            const questionInput = document.getElementById('questionInput');
+            const question = questionInput.value.trim();
+            
+            if (!question) {
+                showNotification('Please enter a question', 'warning');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                // Simulate AI response (replace with actual API call)
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                const sampleResponse = `Based on your uploaded documents, here's what I found regarding "${question}":
+
+This is a sample AI response demonstrating how the system would analyze your documents and provide intelligent answers. In a real implementation, this would connect to:
+
+• Document processing services
+• AI language models
+• Vector databases for semantic search
+• Advanced natural language understanding
+
+The response would include:
+- Relevant excerpts from your documents
+- Citations and page references  
+- Contextual analysis and insights
+- Follow-up questions for deeper exploration
+
+This interface is designed to handle complex document analysis tasks with a beautiful, responsive user experience.`;
+                
+                showResponse(sampleResponse, 'success', true);
+            } catch (error) {
+                showResponse("❌ Failed to get answer. Please try again.", 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Summary Functionality
+        async function summarize() {
+            showLoading();
+            
+            try {
+                // Simulate summary generation (replace with actual API call)
+                await new Promise(resolve => setTimeout(resolve, 2500));
+                const sampleSummary = `📊 DOCUMENT SUMMARY
+
+Key Findings:
+• This is a demonstration of the document summarization feature
+• In production, this would analyze all uploaded documents
+• Generate concise summaries of main points and themes
+• Identify key metrics, conclusions, and recommendations
+
+Document Overview:
+• Total pages processed: [Dynamic based on uploads]
+• Main topics identified: Technology, Business Strategy, Implementation
+• Reading time: Approximately 15-20 minutes
+• Complexity level: Intermediate to Advanced
+
+Recommendations:
+• Focus on the implementation section for actionable insights
+• Review the conclusion for strategic recommendations
+• Consider the methodology section for process understanding
+
+This summary was generated using advanced AI to help you quickly understand the core content of your documents.`;
+                
+                showResponse(sampleSummary, 'success', true);
+            } catch (error) {
+                showResponse("❌ Failed to generate summary. Please try again.", 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Delete Files Functionality
+        async function deleteFiles() {
+            if (!confirm('Are you sure you want to delete all files? This action cannot be undone.')) {
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                // Simulate file deletion (replace with actual API call)
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                showResponse('🗑️ All files have been successfully deleted from the system.', 'success');
+                
+                // Reset file selection
+                selectedFiles = [];
+                fileInput.value = '';
+                displayFileList();
+                updateUploadButton();
+                
+                // Clear question input
+                document.getElementById('questionInput').value = '';
+                
+            } catch (error) {
+                showResponse("❌ Failed to delete files. Please try again.", 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Response Display with Typing Effect
+        function showResponse(message, type = 'success', useTypingEffect = false) {
+            responseSection.style.display = 'block';
+            response.textContent = '';
+            
+            // Scroll to response section
+            responseSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            if (useTypingEffect) {
+                typingIndicator.style.display = 'flex';
+                typeWriter(message, response, () => {
+                    typingIndicator.style.display = 'none';
+                });
+            } else {
+                response.textContent = message;
+                typingIndicator.style.display = 'none';
+            }
+            
+            // Add type-specific styling
+            response.className = `response-text ${type}`;
+        }
+
+        // Typing Effect
+        function typeWriter(text, element, callback, speed = 30) {
+            let i = 0;
+            element.textContent = '';
+            
+            function type() {
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                } else if (callback) {
+                    callback();
+                }
+            }
+            
+            type();
+        }
+
+        // Loading Overlay
+        function showLoading() {
+            loadingOverlay.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideLoading() {
+            loadingOverlay.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        // Notification System
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 2rem;
+                left: 50%;
+                transform: translateX(-50%);
+                background: var(--bg-card);
+                color: var(--text-primary);
+                padding: 1rem 2rem;
+                border-radius: 1rem;
+                box-shadow: 0 8px 32px var(--shadow-color);
+                z-index: 10000;
+                animation: slideInDown 0.3s ease-out;
+                border: 1px solid var(--border-color);
+                backdrop-filter: blur(20px);
+            `;
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutUp 0.3s ease-in';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Keyboard Shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Ctrl/Cmd + Enter to ask question
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                askQuestion();
+            }
+            
+            // Ctrl/Cmd + U to focus upload
+            if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
+                e.preventDefault();
+                fileInput.click();
+            }
+            
+            // Ctrl/Cmd + D to toggle theme
+            if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+                e.preventDefault();
+                toggleTheme();
+            }
+        });
+
+        // Initialize Animations
+        function initializeAnimations() {
+            // Stagger card animations
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.2}s`;
+            });
+            
+            // Add intersection observer for scroll animations
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            // Observe all cards
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(card);
+            });
+        }
+
+        // Initialize on load
+        updateUploadButton();
+    </script>
+</body>
+</html>
