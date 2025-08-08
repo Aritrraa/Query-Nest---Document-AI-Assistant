@@ -33,7 +33,8 @@ Path(app.config['UPLOAD_FOLDER']).mkdir(parents=True, exist_ok=True)
 
 # Groq and Embedding model setup
 groq_client = Groq(api_key=GROQ_API_KEY)
-embed_model = HuggingFaceEmbedding(model_name="sentence-transformers/all-mpnet-base-v2")
+embed_model = HuggingFaceEmbedding(model_name="sentence-transformers/all-MiniLM-L6-v2")
+
 
 # Utility: Process files to extract text
 def process_file(file_path):
@@ -159,3 +160,4 @@ def delete_files():
 # Run the app
 if __name__ == '__main__':
     app.run(debug=True)
+
