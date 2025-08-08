@@ -7,5 +7,4 @@ groq>=0.4.2
 llama-index>=0.10
 llama-index-embeddings-huggingface>=0.1.5
 transformers>=4.40.0
-torch==2.0.1
-sentence-transformers
+torch>=2.0.0
