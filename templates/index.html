@@ -929,7 +929,7 @@
                     <i class="fas fa-brain"></i>
                 </div>
             </div>
-            <h1 class="title">Query Nest </h1>
+            <h1 class="title">Query Nest</h1>
             <h2 class="subtitle">Document AI Assistant</h2>
             <p class="subtitle">Experience the future of document analysis with our advanced AI-powered assistant</p>
             <div class="features">
@@ -959,13 +959,13 @@
             
             <form id="uploadForm">
                 <div class="upload-area" id="uploadArea">
-                    <input type="file" id="fileInput" name="file" multiple accept=".pdf,.doc,.docx,.txt" hidden>
+                    <input type="file" id="fileInput" name="file" multiple accept=".pdf,.docx,.xlsx,.xls" hidden>
                     <div class="upload-content">
                         <div class="upload-icon">
                             <i class="fas fa-cloud-upload-alt"></i>
                         </div>
                         <h3>Drop files here or click to upload</h3>
-                        <p>Supports PDF, DOC, DOCX, and TXT files</p>
+                        <p>Supports PDF, DOCX, XLSX, and XLS files</p>
                         <div class="upload-features">
                             <span class="feature-tag">Multi-file support</span>
                             <span class="feature-tag">Instant indexing</span>
@@ -1231,7 +1231,7 @@
             }
         }
 
-        // Form Submission
+        // Form Submission - Updated to work with Flask backend
         uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -1240,11 +1240,26 @@
             showLoading();
             updateUploadButton('uploading');
             
-            // Simulate upload process (replace with actual API call)
             try {
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                showResponse("✅ Files uploaded and indexed successfully! You can now ask questions about your documents.", 'success');
-                updateUploadButton('success');
+                const formData = new FormData();
+                selectedFiles.forEach(file => {
+                    formData.append("file", file);
+                });
+
+                const res = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await res.json();
+                
+                if (data.error) {
+                    showResponse(`❌ Error: ${data.error}`, 'error');
+                    updateUploadButton('error');
+                } else {
+                    showResponse("✅ Files uploaded and indexed successfully! You can now ask questions about your documents.", 'success');
+                    updateUploadButton('success');
+                }
             } catch (error) {
                 showResponse("❌ Upload failed. Please try again.", 'error');
                 updateUploadButton('error');
@@ -1253,7 +1268,7 @@
             }
         });
 
-        // Question Functionality
+        // Question Functionality - Updated to work with Flask backend
         function setQuestion(questionText) {
             const questionInput = document.getElementById('questionInput');
             questionInput.value = questionText;
@@ -1278,26 +1293,19 @@
             showLoading();
             
             try {
-                // Simulate AI response (replace with actual API call)
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                const sampleResponse = `Based on your uploaded documents, here's what I found regarding "${question}":
+                const res = await fetch('/query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question })
+                });
 
-This is a sample AI response demonstrating how the system would analyze your documents and provide intelligent answers. In a real implementation, this would connect to:
-
-• Document processing services
-• AI language models
-• Vector databases for semantic search
-• Advanced natural language understanding
-
-The response would include:
-- Relevant excerpts from your documents
-- Citations and page references  
-- Contextual analysis and insights
-- Follow-up questions for deeper exploration
-
-This interface is designed to handle complex document analysis tasks with a beautiful, responsive user experience.`;
+                const data = await res.json();
                 
-                showResponse(sampleResponse, 'success', true);
+                if (data.error) {
+                    showResponse(`❌ Error: ${data.error}`, 'error');
+                } else {
+                    showResponse(data.response || '', 'success', true);
+                }
             } catch (error) {
                 showResponse("❌ Failed to get answer. Please try again.", 'error');
             } finally {
@@ -1305,35 +1313,19 @@ This interface is designed to handle complex document analysis tasks with a beau
             }
         }
 
-        // Summary Functionality
+        // Summary Functionality - Updated to work with Flask backend
         async function summarize() {
             showLoading();
             
             try {
-                // Simulate summary generation (replace with actual API call)
-                await new Promise(resolve => setTimeout(resolve, 2500));
-                const sampleSummary = `📊 DOCUMENT SUMMARY
-
-Key Findings:
-• This is a demonstration of the document summarization feature
-• In production, this would analyze all uploaded documents
-• Generate concise summaries of main points and themes
-• Identify key metrics, conclusions, and recommendations
-
-Document Overview:
-• Total pages processed: [Dynamic based on uploads]
-• Main topics identified: Technology, Business Strategy, Implementation
-• Reading time: Approximately 15-20 minutes
-• Complexity level: Intermediate to Advanced
-
-Recommendations:
-• Focus on the implementation section for actionable insights
-• Review the conclusion for strategic recommendations
-• Consider the methodology section for process understanding
-
-This summary was generated using advanced AI to help you quickly understand the core content of your documents.`;
+                const res = await fetch('/summary');
+                const data = await res.json();
                 
-                showResponse(sampleSummary, 'success', true);
+                if (data.error) {
+                    showResponse(`❌ Error: ${data.error}`, 'error');
+                } else {
+                    showResponse(data.summary || '', 'success', true);
+                }
             } catch (error) {
                 showResponse("❌ Failed to generate summary. Please try again.", 'error');
             } finally {
@@ -1341,7 +1333,7 @@ This summary was generated using advanced AI to help you quickly understand the 
             }
         }
 
-        // Delete Files Functionality
+        // Delete Files Functionality - Updated to work with Flask backend
         async function deleteFiles() {
             if (!confirm('Are you sure you want to delete all files? This action cannot be undone.')) {
                 return;
@@ -1350,10 +1342,12 @@ This summary was generated using advanced AI to help you quickly understand the 
             showLoading();
             
             try {
-                // Simulate file deletion (replace with actual API call)
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
-                showResponse('🗑️ All files have been successfully deleted from the system.', 'success');
+                const res = await fetch('/delete', {
+                    method: 'POST'
+                });
+
+                const data = await res.json();
+                showResponse(data.message || 'Files deleted successfully', 'success');
                 
                 // Reset file selection
                 selectedFiles = [];
