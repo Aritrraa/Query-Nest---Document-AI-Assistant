@@ -127,21 +127,21 @@ Main dependencies:
 ## 🖼️ Screenshots / Project Images
 
 ### 1️⃣ Project Overview  
-![Project Overview](images/project_overview1.png)
-![Project Overview](images/project_overview2.png)
-![Project Overview](images/project_overview3.png)
+![Project Overview](project_overview1.png)
+![Project Overview](project_overview2.png)
+![Project Overview](project_overview3.png)
 
 ### 2️⃣ Document Upload  
-![Upload Document](images/upload.png)
+![Upload Document](upload.png)
 
 ### 3️⃣ Processing & Indexing  
-![Processing Document](images/processing.png)
+![Processing Document](processing.png)
 
 ### 4️⃣ Ask Questions (QA Interface)  
-![QA Demo](images/query.png)
+![QA Demo](query.png)
 
 ### 5️⃣ Document Summary Generation  
-![Summary Output](images/summary.png)
+![Summary Output](summary.png)
 
 ---
 
